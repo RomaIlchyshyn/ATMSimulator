@@ -1,31 +1,39 @@
 package Service;
 
 import models.Account;
+import models.Bank;
+
+import java.math.BigDecimal;
 
 public class ATMService {
     private Account currentAccount;
+    private Bank bank;
 
-    public boolean login(Account account, int pin) {
-        if(account != null && account.getPinCode() == pin) {
-            this.currentAccount = account;
-            return true;
-        }
-        return false;
+    public ATMService(Bank bank) {
+        this.bank = bank;
     }
+
+    public boolean login(String cardNumber, int pin) {
+       logout();
+       return bank.findAccount(cardNumber).filter(account ->  account.getPinCode() == pin)
+               .map(account -> {currentAccount = account;
+       return true;}).orElse(false);
+    }
+
     public void logout() {
         this.currentAccount = null;
     }
-    public double getUserBalance() {
+    public BigDecimal getUserBalance() {
         return currentAccount.getBalance();
     }
-    public boolean depositMoney(double amount) {
-        if(amount > 0) {
+    public boolean depositMoney(BigDecimal amount) {
+        if(amount.compareTo(BigDecimal.ZERO) > 0) {
             currentAccount.depositMoney(amount);
             return true;
         }
         return false;
     }
-    public boolean withdrawMoney(double amount) {
+    public boolean withdrawMoney(BigDecimal amount) {
         return currentAccount.withdrawMoney(amount);
     }
 }

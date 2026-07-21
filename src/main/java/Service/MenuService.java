@@ -3,6 +3,8 @@ package Service;
 import models.Account;
 import models.Bank;
 
+import java.math.BigDecimal;
+import java.util.Optional;
 import java.util.Scanner;
 
 public class MenuService {
@@ -25,9 +27,9 @@ public class MenuService {
         int pin = scanner.nextInt();
         System.out.println(pin);
 
-        Account account = bank.findAccount(cardNumber);
+        Optional<Account> account = bank.findAccount(cardNumber);
 
-        if(atmService.login(account, pin)) {
+        if(atmService.login(cardNumber, pin)) {
             System.out.println("=== You successfully authorized ===");
             mainMenu();
         } else {
@@ -35,7 +37,7 @@ public class MenuService {
         }
 
     }
-    public void mainMenu() {
+    private void mainMenu() {
         boolean serviceOn = true;
         while (serviceOn) {
             System.out.println(" MAIN MENU ");
@@ -51,7 +53,7 @@ public class MenuService {
                     break;
                 case 2:
                     System.out.println("Enter amount of deposit");
-                    double depositAmount = scanner.nextDouble();
+                    BigDecimal depositAmount = scanner.nextBigDecimal();
                     if(atmService.depositMoney(depositAmount)) {
                         System.out.println("Your balance successfully deposited");
                     } else {
@@ -60,7 +62,7 @@ public class MenuService {
                     break;
                 case 3:
                     System.out.println("Enter withdrawal amount");
-                    double withdrawalAmount = scanner.nextDouble();
+                    BigDecimal withdrawalAmount = scanner.nextBigDecimal();
                     if(atmService.withdrawMoney(withdrawalAmount)) {
                         System.out.println("Please take your money");
                     } else {
@@ -69,6 +71,7 @@ public class MenuService {
                     break;
                 case 4:
                     serviceOn = false;
+                    atmService.logout();
                     System.out.println("The end!");
                     break;
                 default:
@@ -77,6 +80,7 @@ public class MenuService {
 
 
         }
+        scanner.close();
     }
 
 }
